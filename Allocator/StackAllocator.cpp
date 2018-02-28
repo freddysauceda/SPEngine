@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "StackAllocator.h"
 
-StackAllocator::StackAllocator( const size_t a_qwTotalSize )
-    : BaseAllocator( a_qwTotalSize ) {};
+StackAllocator::StackAllocator( const size_t a_TotalSize )
+    : BaseAllocator( a_TotalSize ) {};
 
 //StackAllocator::StackAllocator( StackAllocator &StackAllocator )
 //{
-//    m_dwOffset = StackAllocator.m_dwOffset;
+//    m_Offset = StackAllocator.m_Offset;
 //    m_pStartPtr = StackAllocator.m_pStartPtr;
 //}
 
@@ -21,37 +21,37 @@ void StackAllocator::Init()
     if ( m_pStartPtr != nullptr ) {
         Free( m_pStartPtr );
     }
-    m_pStartPtr = malloc( m_dwTotalSize );
-    m_dwOffset = 0;
+    m_pStartPtr = malloc( m_TotalSize );
+    m_Offset = 0;
 }
 
-void * StackAllocator::Allocate( const size_t & a_qwSize, const size_t & a_qwAlignment )
+void * StackAllocator::Allocate( const size_t & a_Size, const size_t & a_Alignment )
 {
-    const size_t qwCurrentAddress = ( size_t ) m_pStartPtr + m_dwOffset;
+    const size_t CurrentAddress = ( size_t ) m_pStartPtr + m_Offset;
 
-    size_t qwPadding = PaddingMath::GetPaddingWithHeader( qwCurrentAddress, a_qwAlignment, sizeof( Header ) );
+    size_t Padding = PaddingMath::GetPaddingWithHeader( CurrentAddress, a_Alignment, sizeof( Header ) );
 
-    if ( m_dwOffset + qwPadding + a_qwSize > m_dwTotalSize ) {
+    if ( m_Offset + Padding + a_Size > m_TotalSize ) {
         return nullptr;
     }
-    m_dwOffset += qwPadding;
+    m_Offset += Padding;
 
-    const size_t qwNextAddress = qwCurrentAddress + qwPadding;
-    const size_t qwHeaderAddress = qwNextAddress - sizeof( Header );
-    Header AllocationHeader { static_cast<u8>( qwPadding ) };
-    Header * HeaderPtr = ( Header* ) qwHeaderAddress;
+    const size_t NextAddress = CurrentAddress + Padding;
+    const size_t HeaderAddress = NextAddress - sizeof( Header );
+    Header AllocationHeader { static_cast<u8>( Padding ) };
+    Header * HeaderPtr = ( Header* ) HeaderAddress;
     HeaderPtr = &AllocationHeader;
 
-    m_dwOffset += a_qwSize;
+    m_Offset += a_Size;
 
 #ifdef _DEBUG
     std::cout << "A" << "\t@C " << ( void* ) currentAddress << "\t@R " << ( void* ) nextAddress << "\tO " << m_offset << "\tP " << padding << std::endl;
 #endif
-    m_dwUsed = m_dwOffset;
-    m_dwPeak = max( m_dwPeak, m_dwUsed );
+    m_Used = m_Offset;
+    m_Peak = max( m_Peak, m_Used );
 
     // void* is a 64-bit address so this is safe
-    return ( void* ) qwNextAddress;
+    return ( void* ) NextAddress;
 }
 
 void StackAllocator::Free( void * ptr )
@@ -61,8 +61,8 @@ void StackAllocator::Free( void * ptr )
     const size_t headerAddress = currentAddress - sizeof( Header );
     const Header * allocationHeader{ ( Header * ) headerAddress };
 
-    m_dwOffset = currentAddress - allocationHeader->uPadding - ( size_t ) m_pStartPtr;
-    m_dwUsed = m_dwOffset;
+    m_Offset = currentAddress - allocationHeader->m_padding - ( size_t ) m_pStartPtr;
+    m_Used = m_Offset;
 
 #ifdef _DEBUG
     std::cout << "F" << "\t@C " << ( void* ) currentAddress << "\t@F " << ( void* ) ( ( char* ) m_start_ptr + m_offset ) << "\tO " << m_offset << std::endl;
@@ -71,7 +71,7 @@ void StackAllocator::Free( void * ptr )
 
 void StackAllocator::Reset()
 {
-    m_dwOffset = 0;
-    m_dwUsed = 0;
-    m_dwPeak = 0;
+    m_Offset = 0;
+    m_Used = 0;
+    m_Peak = 0;
 }

@@ -4,32 +4,32 @@
 class PaddingMath
 {
 public:
-    static const size_t GetPadding( const size_t& a_qwBaseAddress, const size_t& a_qwAlignment )
+    static const size_t GetPadding( const size_t& a_BaseAddress, const size_t& a_Alignment )
     {
-        const size_t qwMultiplier = ( a_qwBaseAddress / a_qwAlignment ) + 1;
-        const size_t qwAlignedAddress = qwMultiplier * a_qwAlignment;
-        const size_t qwPadding = qwAlignedAddress - a_qwBaseAddress;
-        return qwPadding;
+        const size_t multiplier = ( a_BaseAddress / a_Alignment ) + 1;
+        const size_t alignedAddress = multiplier * a_Alignment;
+        const size_t padding = alignedAddress - a_BaseAddress;
+        return padding;
     }
 
-    static const size_t GetPaddingWithHeader( const size_t& a_qwBaseAddress, const size_t& a_qwAlignment, const size_t& a_qwHeaderSize ) {
-        size_t qwPadding = GetPadding( a_qwBaseAddress, a_qwAlignment );
-        size_t qwNeededSpace = a_qwHeaderSize;
+    static const size_t GetPaddingWithHeader( const size_t& a_BaseAddress, const size_t& a_Alignment, const size_t& a_HeaderSize ) {
+        size_t padding = GetPadding( a_BaseAddress, a_Alignment );
+        size_t neededSpace = a_HeaderSize;
 
-        if ( qwPadding < qwNeededSpace ){
+        if ( padding < neededSpace ){
             // Header doesn't fit, get the next address that does, make sure to align it to the 4 byte boundary
-            qwNeededSpace -= qwPadding;
+            neededSpace -= padding;
 
             // How many alignments I need to fit       
-            if ( qwNeededSpace % a_qwAlignment > 0 ){
-                qwPadding += a_qwAlignment * ( 1 + ( qwNeededSpace / a_qwAlignment ) );
+            if ( neededSpace % a_Alignment > 0 ){
+                padding += a_Alignment * ( 1 + ( neededSpace / a_Alignment ) );
             }
             else {
-                qwPadding += a_qwAlignment * ( qwNeededSpace / a_qwAlignment );
+                padding += a_Alignment * ( neededSpace / a_Alignment );
             }
         }
 
-        return qwPadding;
+        return padding;
     }
 };
 

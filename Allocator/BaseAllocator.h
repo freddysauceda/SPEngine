@@ -19,9 +19,9 @@ public:
     virtual void Free( void* pPtr ) = 0;
 
 protected:
-    size_t m_dwTotalSize;
-    size_t m_dwUsed;
-    size_t m_dwPeak;
+    size_t m_TotalSize;
+    size_t m_Used;
+    size_t m_Peak;
 };
 
 

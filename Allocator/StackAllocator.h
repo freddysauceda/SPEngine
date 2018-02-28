@@ -7,12 +7,12 @@ class StackAllocator : public BaseAllocator
 {
 protected:
     void* m_pStartPtr = nullptr;
-    size_t m_dwOffset;
+    size_t m_Offset;
 public:
-    StackAllocator( const size_t a_qwTotalSize );
+    StackAllocator( const size_t a_TotalSize );
     virtual ~StackAllocator();
 
-    virtual void*   Allocate( const size_t& a_qwSize, const size_t& a_qwAlignment = 0 ) override;
+    virtual void*   Allocate( const size_t& a_Size, const size_t& a_Alignment = 0 ) override;
     virtual void    Free( void* ptr );
     virtual void    Init() override;
     virtual void    Reset();
@@ -21,7 +21,7 @@ private:
 
     struct Header
     {
-        u8 uPadding;
+        u8 m_padding;
     };
 };
 
