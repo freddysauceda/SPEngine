@@ -27,20 +27,20 @@ void StackAllocator::Init()
 
 void * StackAllocator::Allocate( const size_t & a_Size, const size_t & a_Alignment )
 {
-    const size_t CurrentAddress = ( size_t ) m_pStartPtr + m_Offset;
+    const size_t currentAddress = ( size_t ) m_pStartPtr + m_Offset;
 
-    size_t Padding = PaddingMath::GetPaddingWithHeader( CurrentAddress, a_Alignment, sizeof( Header ) );
+    size_t padding = PaddingMath::GetPaddingWithHeader( currentAddress, a_Alignment, sizeof( Header ) );
 
-    if ( m_Offset + Padding + a_Size > m_TotalSize ) {
+    if ( m_Offset + padding + a_Size > m_TotalSize ) {
         return nullptr;
     }
-    m_Offset += Padding;
+    m_Offset += padding;
 
-    const size_t NextAddress = CurrentAddress + Padding;
-    const size_t HeaderAddress = NextAddress - sizeof( Header );
-    Header AllocationHeader { static_cast<u8>( Padding ) };
-    Header * HeaderPtr = ( Header* ) HeaderAddress;
-    HeaderPtr = &AllocationHeader;
+    const size_t nextAddress = currentAddress + padding;
+    const size_t headerAddress = nextAddress - sizeof( Header );
+    Header allocationHeader { (u8) padding };
+    Header* pHeaderPtr = ( Header* ) headerAddress;
+    pHeaderPtr = &allocationHeader;
 
     m_Offset += a_Size;
 
@@ -51,13 +51,13 @@ void * StackAllocator::Allocate( const size_t & a_Size, const size_t & a_Alignme
     m_Peak = max( m_Peak, m_Used );
 
     // void* is a 64-bit address so this is safe
-    return ( void* ) NextAddress;
+    return ( void* ) nextAddress;
 }
 
-void StackAllocator::Free( void * ptr )
+void StackAllocator::Free( void* a_Ptr )
 {
     // Move offset back to clear address
-    const size_t currentAddress = ( size_t ) ptr;
+    const size_t currentAddress = ( size_t ) a_Ptr;
     const size_t headerAddress = currentAddress - sizeof( Header );
     const Header * allocationHeader{ ( Header * ) headerAddress };
 
@@ -65,7 +65,7 @@ void StackAllocator::Free( void * ptr )
     m_Used = m_Offset;
 
 #ifdef _DEBUG
-    std::cout << "F" << "\t@C " << ( void* ) currentAddress << "\t@F " << ( void* ) ( ( char* ) m_start_ptr + m_offset ) << "\tO " << m_offset << std::endl;
+    std::cout << "F" << "\t@C " << ( void* ) currentAddress << "\t@F " << ( void* ) ( ( char* ) m_pStartPtr + m_Offset ) << "\tO " << m_Offset << std::endl;
 #endif
 }
 

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "BaseAllocator.h"
 
-BaseAllocator::BaseAllocator( const size_t& dwTotalSize )
+BaseAllocator::BaseAllocator( const size_t& a_TotalSize )
 {
-    m_TotalSize = dwTotalSize;
+    m_TotalSize = a_TotalSize;
     m_Used = 0;
 }
 
